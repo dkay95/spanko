@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 100" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  <!-- arc / headboard -->
+  <path d="M18 52 A42 42 0 0 1 102 52" opacity="0.9"/>
+  <!-- crescent moon -->
+  <path d="M44 20 a9 9 0 1 0 8 13 a7 7 0 1 1 -8 -13z"/>
+  <!-- stars -->
+  <path d="M62 16 l1.6 3.4 3.4 1.6 -3.4 1.6 -1.6 3.4 -1.6 -3.4 -3.4 -1.6 3.4 -1.6z" stroke-width="1.4"/>
+  <circle cx="74" cy="30" r="1.1" fill="currentColor"/>
+  <!-- mattress / bed base -->
+  <rect x="30" y="70" width="60" height="14" rx="4"/>
+  <line x1="30" y1="78" x2="90" y2="78" stroke-width="1.4" opacity="0.7"/>
+  <!-- sloth body draped on the bed -->
+  <path d="M42 70 q4 -18 20 -18 q16 0 20 18"/>
+  <!-- sloth head -->
+  <circle cx="50" cy="58" r="9"/>
+  <!-- sloth face markings (sleepy eyes) -->
+  <path d="M46 57 q1.5 2 3 0" stroke-width="1.6"/>
+  <path d="M52 57 q1.5 2 3 0" stroke-width="1.6"/>
+  <path d="M50 61 q0 1.5 0 1.5" stroke-width="1.6"/>
+  <!-- little arm hanging -->
+  <path d="M62 60 q6 6 4 14" stroke-width="1.8"/>
+</svg>
