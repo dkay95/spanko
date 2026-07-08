@@ -1,1 +1,271 @@
-<!doctype html><html lang="pl"><head><meta charset="utf-8"><title>Spanko</title></head><body>Spanko</body></html>
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Spanko — Sen ma znaczenie</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="assets/logo.svg">
+</head>
+<body>
+
+  <!-- ============ HEADER ============ -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="#top">
+        <span class="brand-mark" data-logo></span>
+        <span class="brand-text">
+          <span class="brand-name">SPANKO</span>
+          <span class="brand-slogan" data-i18n="hero_tag">Sen ma znaczenie</span>
+        </span>
+      </a>
+      <nav class="main-nav">
+        <a href="#top" data-i18n="nav_home">Strona główna</a>
+        <a href="#kategorie" data-i18n="nav_beds">Łóżka</a>
+        <a href="#kategorie" data-i18n="nav_mattresses">Materace</a>
+        <a href="#kategorie" data-i18n="nav_accessories">Akcesoria</a>
+        <a href="#o-nas" data-i18n="nav_about">O nas</a>
+        <a href="#kontakt" data-i18n="nav_contact">Kontakt</a>
+      </nav>
+      <div class="lang-switch">
+        <button data-lang-btn="pl">PL</button>
+        <button data-lang-btn="de">DE</button>
+      </div>
+    </div>
+  </header>
+
+  <main id="top">
+
+    <!-- ============ HERO ============ -->
+    <section class="hero">
+      <div class="container hero-inner">
+        <div class="hero-copy">
+          <span class="eyebrow" data-i18n="hero_tag">Sen ma znaczenie</span>
+          <h1 data-i18n="hero_title">Dobry sen zaczyna się tutaj</h1>
+          <p data-i18n="hero_sub">Tworzymy produkty, które zapewniają komfort, piękno i jakość snu każdej nocy.</p>
+          <div class="hero-actions">
+            <a class="btn btn-gold" href="#kategorie" data-i18n="cta_products">Zobacz produkty</a>
+            <a class="btn btn-outline" href="#kontakt" data-i18n="cta_visit">Umów wizytę</a>
+          </div>
+          <div class="hero-bubble">
+            <span class="bubble-mark" data-logo></span>
+            <p data-i18n="hero_bubble">Kliknij kategorię poniżej i znajdź to, czego potrzebujesz.</p>
+          </div>
+        </div>
+        <div class="hero-visual" aria-hidden="true">
+          <div class="hero-bed">
+            <div class="hero-glow"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CATEGORIES ============ -->
+    <section class="section categories" id="kategorie">
+      <div class="container">
+        <h2 class="section-title" data-i18n="cat_heading">Wybierz kategorię</h2>
+        <div class="cat-grid">
+          <a class="cat-card" href="#">
+            <span class="cat-icon">🛏️</span>
+            <span class="cat-name" data-i18n="cat_beds">Łóżka</span>
+            <span class="cat-more" data-i18n="cat_more">Zobacz więcej</span>
+          </a>
+          <a class="cat-card" href="#">
+            <span class="cat-icon">🧱</span>
+            <span class="cat-name" data-i18n="cat_mattresses">Materace</span>
+            <span class="cat-more" data-i18n="cat_more">Zobacz więcej</span>
+          </a>
+          <a class="cat-card" href="#">
+            <span class="cat-icon">🧺</span>
+            <span class="cat-name" data-i18n="cat_bedding">Pościel</span>
+            <span class="cat-more" data-i18n="cat_more">Zobacz więcej</span>
+          </a>
+          <a class="cat-card" href="#">
+            <span class="cat-icon">💤</span>
+            <span class="cat-name" data-i18n="cat_pillows">Poduszki</span>
+            <span class="cat-more" data-i18n="cat_more">Zobacz więcej</span>
+          </a>
+          <a class="cat-card" href="#">
+            <span class="cat-icon">🧸</span>
+            <span class="cat-name" data-i18n="cat_kids">Dla dzieci</span>
+            <span class="cat-more" data-i18n="cat_more">Zobacz więcej</span>
+          </a>
+          <a class="cat-card" href="#">
+            <span class="cat-icon">🕯️</span>
+            <span class="cat-name" data-i18n="cat_accessories">Akcesoria</span>
+            <span class="cat-more" data-i18n="cat_more">Zobacz więcej</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ BENEFITS ============ -->
+    <section class="section benefits">
+      <div class="container">
+        <h2 class="section-title light" data-i18n="ben_heading">Dlaczego Spanko?</h2>
+        <div class="ben-grid">
+          <div class="ben-item">
+            <span class="ben-icon">🌙</span>
+            <h3 data-i18n="ben_test_t">100 nocy na test</h3>
+            <p data-i18n="ben_test_d">Masz 100 nocy na spokojne przetestowanie materaca.</p>
+          </div>
+          <div class="ben-item">
+            <span class="ben-icon">🛡️</span>
+            <h3 data-i18n="ben_warranty_t">10 lat gwarancji</h3>
+            <p data-i18n="ben_warranty_d">Długa gwarancja to nasza obietnica jakości.</p>
+          </div>
+          <div class="ben-item">
+            <span class="ben-icon">🚚</span>
+            <h3 data-i18n="ben_delivery_t">Darmowa dostawa</h3>
+            <p data-i18n="ben_delivery_d">Szybka i bezpieczna dostawa do Twojego domu.</p>
+          </div>
+          <div class="ben-item">
+            <span class="ben-icon">🏅</span>
+            <h3 data-i18n="ben_quality_t">Polska jakość</h3>
+            <p data-i18n="ben_quality_d">Wspieramy lokalną produkcję i najlepsze materiały.</p>
+          </div>
+          <div class="ben-item">
+            <span class="ben-icon">🎧</span>
+            <h3 data-i18n="ben_advice_t">Profesjonalne doradztwo</h3>
+            <p data-i18n="ben_advice_d">Nasi eksperci pomogą Ci wybrać idealne rozwiązanie.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PRODUCTS ============ -->
+    <section class="section products">
+      <div class="container">
+        <h2 class="section-title" data-i18n="prod_heading">Polecane produkty</h2>
+        <div class="prod-grid">
+          <article class="prod-card">
+            <div class="prod-img prod-img-1"></div>
+            <h3 data-i18n="prod_bed">Łóżko Luna</h3>
+            <p class="prod-price"><span data-i18n="prod_from">od</span> 1 899 zł</p>
+            <p class="stars">★★★★★ <span class="stars-count">(24)</span></p>
+          </article>
+          <article class="prod-card">
+            <div class="prod-img prod-img-2"></div>
+            <h3 data-i18n="prod_mattress">Materac Premium</h3>
+            <p class="prod-price"><span data-i18n="prod_from">od</span> 1 299 zł</p>
+            <p class="stars">★★★★☆ <span class="stars-count">(38)</span></p>
+          </article>
+          <article class="prod-card">
+            <div class="prod-img prod-img-3"></div>
+            <h3 data-i18n="prod_frame">Stelaż Comfort</h3>
+            <p class="prod-price"><span data-i18n="prod_from">od</span> 1 199 zł</p>
+            <p class="stars">★★★★☆ <span class="stars-count">(16)</span></p>
+          </article>
+          <article class="prod-card">
+            <div class="prod-img prod-img-4"></div>
+            <h3 data-i18n="prod_pillow">Poduszka Cloud</h3>
+            <p class="prod-price"><span data-i18n="prod_from">od</span> 199 zł</p>
+            <p class="stars">★★★★★ <span class="stars-count">(52)</span></p>
+          </article>
+        </div>
+        <div class="center">
+          <a class="btn btn-outline-dark" href="#" data-i18n="prod_all">Zobacz wszystkie produkty</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ ABOUT ============ -->
+    <section class="section about" id="o-nas">
+      <div class="container about-inner">
+        <div class="about-img" aria-hidden="true"></div>
+        <div class="about-copy">
+          <h2 class="section-title" data-i18n="about_heading">O salonie</h2>
+          <p data-i18n="about_text">Od lat pomagamy dobrać idealny materac i stworzyć komfortową sypialnię. Oferujemy materace, łóżka oraz akcesoria renomowanych producentów. W naszym salonie liczy się jakość, profesjonalna obsługa i Twoje zadowolenie.</p>
+          <a class="btn btn-gold" href="#kontakt" data-i18n="about_cta">Poznaj nas</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ TESTIMONIALS ============ -->
+    <section class="section testimonials">
+      <div class="container">
+        <h2 class="section-title light" data-i18n="rev_heading">Opinie klientów</h2>
+        <div class="rev-grid">
+          <blockquote class="rev-card">
+            <p class="stars">★★★★★</p>
+            <p data-i18n="rev_1">„Bardzo profesjonalna obsługa. Duży wybór i świetne doradztwo." — Anna K.</p>
+          </blockquote>
+          <blockquote class="rev-card">
+            <p class="stars">★★★★★</p>
+            <p data-i18n="rev_2">„Najlepszy wybór materacy w okolicy. Świetna jakość!" — Marcin T.</p>
+          </blockquote>
+          <blockquote class="rev-card">
+            <p class="stars">★★★★★</p>
+            <p data-i18n="rev_3">„Polecam każdemu! Wygodne łóżko zmieniło mój sen na lepsze." — Katarzyna P.</p>
+          </blockquote>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CONTACT ============ -->
+    <section class="section contact" id="kontakt">
+      <div class="container contact-inner">
+        <div class="contact-copy">
+          <h2 class="section-title" data-i18n="con_heading">Kontakt</h2>
+          <ul class="contact-list">
+            <li>📍 <span data-i18n="con_address">TANIEC 1, 32-800 Brzesko</span></li>
+            <li>📞 123 456 789</li>
+            <li>✉️ biuro@spanko.pl</li>
+          </ul>
+          <h3 class="contact-hours-t" data-i18n="con_hours_t">Godziny otwarcia</h3>
+          <p data-i18n="con_hours">Pon–Pt: 9:00–17:00 · Sob: 9:00–13:00</p>
+          <a class="btn btn-gold" href="#" data-i18n="con_route">Wyznacz trasę</a>
+        </div>
+        <div class="contact-map" aria-hidden="true">
+          <span data-i18n="con_map">Mapa dojazdu</span>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <span class="brand-mark" data-logo></span>
+        <span class="brand-name">SPANKO</span>
+        <span class="brand-slogan" data-i18n="hero_tag">Sen ma znaczenie</span>
+      </div>
+      <div class="footer-col">
+        <h4 data-i18n="foot_products">Produkty</h4>
+        <a href="#" data-i18n="cat_beds">Łóżka</a>
+        <a href="#" data-i18n="cat_mattresses">Materace</a>
+        <a href="#" data-i18n="cat_bedding">Pościel</a>
+        <a href="#" data-i18n="cat_accessories">Akcesoria</a>
+      </div>
+      <div class="footer-col">
+        <h4 data-i18n="foot_info">Informacje</h4>
+        <a href="#o-nas" data-i18n="foot_about">O nas</a>
+        <a href="#" data-i18n="foot_delivery">Dostawa i płatności</a>
+        <a href="#" data-i18n="foot_returns">Zwroty i reklamacje</a>
+        <a href="#" data-i18n="foot_terms">Regulamin</a>
+      </div>
+      <div class="footer-col">
+        <h4 data-i18n="foot_help">Pomoc</h4>
+        <a href="#" data-i18n="foot_faq">FAQ</a>
+        <a href="#" data-i18n="foot_guide">Poradnik</a>
+        <a href="#kontakt" data-i18n="nav_contact">Kontakt</a>
+        <a href="#" data-i18n="foot_privacy">Polityka prywatności</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span data-i18n="foot_rights">© 2026 Spanko. Wszelkie prawa zastrzeżone.</span>
+    </div>
+  </footer>
+
+  <script src="i18n.js"></script>
+  <script src="chat-widget.js"></script>
+  <script>
+    // inline the logo SVG into every [data-logo] slot
+    fetch('assets/logo.svg').then(r => r.text()).then(svg => {
+      document.querySelectorAll('[data-logo]').forEach(el => { el.innerHTML = svg; });
+    });
+  </script>
+</body>
+</html>
