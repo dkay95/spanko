@@ -1,3 +1,5 @@
 node_modules/
 .chat/
+.chat-test/
+site/assets/uploads/
 *.log

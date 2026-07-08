@@ -266,7 +266,19 @@ h1, h2, h3, h4 { font-family: var(--serif); font-weight: 600; line-height: 1.15;
 }
 .spanko-chat .msg.colleague { align-self: flex-end; background: var(--gold); color: #23180a; border-bottom-right-radius: 4px; }
 .spanko-chat .msg.assistant { align-self: flex-start; background: var(--navy-soft); color: var(--text-dark); border-bottom-left-radius: 4px; }
-.spanko-chat #chatForm { display: flex; gap: 8px; padding: 12px; background: var(--navy-deep); border-top: 1px solid rgba(201,154,75,.2); }
+.spanko-chat .msg-img { display: block; max-width: 100%; border-radius: 8px; margin-bottom: 4px; }
+.spanko-chat #chatDrop {
+  position: absolute; left: 12px; right: 12px; bottom: 70px; z-index: 2;
+  padding: 16px; text-align: center; font-size: .82rem; color: var(--gold-light);
+  background: rgba(11,21,38,.92); border: 2px dashed var(--gold); border-radius: 12px;
+}
+.spanko-chat #chatForm { display: flex; align-items: center; gap: 8px; padding: 12px; background: var(--navy-deep); border-top: 1px solid rgba(201,154,75,.2); }
+.spanko-chat #chatAttach {
+  display: grid; place-items: center; width: 38px; height: 38px; flex: 0 0 auto;
+  border-radius: 8px; cursor: pointer; font-size: 1.1rem;
+  border: 1px solid rgba(201,154,75,.3); background: rgba(255,255,255,.06);
+}
+.spanko-chat #chatAttach:hover { background: rgba(201,154,75,.18); }
 .spanko-chat #chatInput {
   flex: 1; padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(201,154,75,.3);
   background: rgba(255,255,255,.06); color: var(--cream); font-size: .9rem; outline: none;
