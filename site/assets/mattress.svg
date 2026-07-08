@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Materac Premium">
+  <rect width="400" height="300" fill="#efe6d3"/>
+  <circle cx="200" cy="150" r="150" fill="#f6efe1"/>
+  <!-- shadow -->
+  <ellipse cx="200" cy="228" rx="150" ry="20" fill="#d8ccb2" opacity="0.7"/>
+  <!-- mattress body -->
+  <g>
+    <rect x="58" y="108" width="284" height="104" rx="16" fill="#fbf7ee" stroke="#e2d7bf" stroke-width="2"/>
+    <!-- top comfort layer -->
+    <rect x="58" y="108" width="284" height="30" rx="16" fill="#ffffff"/>
+    <!-- side gusset line -->
+    <line x1="58" y1="176" x2="342" y2="176" stroke="#e2d7bf" stroke-width="2"/>
+    <!-- quilting buttons -->
+    <g fill="#c99a4b">
+      <circle cx="108" cy="155" r="3.5"/><circle cx="158" cy="155" r="3.5"/>
+      <circle cx="208" cy="155" r="3.5"/><circle cx="258" cy="155" r="3.5"/><circle cx="308" cy="155" r="3.5"/>
+    </g>
+    <!-- quilting diamonds -->
+    <g stroke="#eadfc7" stroke-width="1.6" fill="none">
+      <path d="M83 122 l25 16 -25 16 -25 -16 z" opacity="0"/>
+      <path d="M108 138 l25 -16 25 16 -25 16 z"/>
+      <path d="M158 138 l25 -16 25 16 -25 16 z"/>
+      <path d="M208 138 l25 -16 25 16 -25 16 z"/>
+      <path d="M258 138 l25 -16 25 16 -25 16 z"/>
+    </g>
+  </g>
+  <!-- gold "premium" ribbon -->
+  <rect x="150" y="196" width="100" height="22" rx="11" fill="#101d33"/>
+  <text x="200" y="211" text-anchor="middle" font-family="Georgia, serif" font-size="12" fill="#e0b968" letter-spacing="2">PREMIUM</text>
+</svg>
