@@ -24,9 +24,12 @@ bash scripts/start.sh
 1. Dein Kollege öffnet den Link und klickt unten rechts auf **💬**.
 2. Er tippt einen Wunsch, z.B. *„die Überschrift soll größer sein"* oder
    *„die Betten-Kategorie ganz nach oben"*.
-3. Seine Nachricht landet in `.chat/messages.jsonl` — und damit bei Claude in der
+3. **Fotos:** Über den 📎-Knopf (oder per Drag & Drop ins Chat-Fenster) kann er ein
+   Foto hochladen. Es landet in `site/assets/uploads/` und erscheint im Chat — Claude
+   sieht es und baut es an der gewünschten Stelle ein.
+4. Seine Nachricht landet in `.chat/messages.jsonl` — und damit bei Claude in der
    offenen Session.
-4. Claude ändert das Design und schreibt eine Antwort zurück, die der Kollege im
+5. Claude ändert das Design und schreibt eine Antwort zurück, die der Kollege im
    Chat sieht. Nach einem Neuladen der Seite sieht er die Änderung.
 
 ## Wichtig (die eine Einschränkung)
