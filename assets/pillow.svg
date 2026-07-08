@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Poduszka Cloud">
+  <rect width="400" height="300" fill="#efe6d3"/>
+  <circle cx="200" cy="150" r="150" fill="#f6efe1"/>
+  <ellipse cx="200" cy="226" rx="128" ry="18" fill="#d8ccb2" opacity="0.7"/>
+  <!-- plump pillow -->
+  <path d="M92 150
+           q-14 -58 50 -66
+           q58 -8 116 0
+           q64 8 50 66
+           q14 58 -50 66
+           q-58 8 -116 0
+           q-64 -8 -50 -66 z"
+        fill="#fbf7ee" stroke="#e6dcc4" stroke-width="2"/>
+  <!-- inner seam -->
+  <path d="M118 150 q-8 -34 34 -40 q48 -6 96 0 q42 6 34 40 q8 34 -34 40 q-48 6 -96 0 q-42 -6 -34 -40 z"
+        fill="none" stroke="#eadfc7" stroke-width="1.6"/>
+  <!-- soft fold shadows -->
+  <path d="M150 120 q50 26 0 60" fill="none" stroke="#eee3cc" stroke-width="3" opacity="0.8"/>
+  <path d="M250 120 q-50 26 0 60" fill="none" stroke="#eee3cc" stroke-width="3" opacity="0.8"/>
+  <!-- gold corner tag -->
+  <circle cx="278" cy="118" r="12" fill="#c99a4b"/>
+  <path d="M278 112 l1.6 3.4 3.6 0.4 -2.6 2.6 0.6 3.6 -3.2 -1.8 -3.2 1.8 0.6 -3.6 -2.6 -2.6 3.6 -0.4 z" fill="#fff"/>
+</svg>

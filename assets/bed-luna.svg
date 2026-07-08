@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Łóżko Luna">
+  <rect width="400" height="300" fill="#101d33"/>
+  <circle cx="200" cy="140" r="150" fill="#182a48"/>
+  <!-- back wall glow -->
+  <ellipse cx="200" cy="90" rx="130" ry="60" fill="#22375c" opacity="0.6"/>
+  <!-- floor -->
+  <rect y="234" width="400" height="66" fill="#0b1526"/>
+  <!-- headboard -->
+  <rect x="66" y="86" width="268" height="96" rx="14" fill="#24344f"/>
+  <g stroke="#1b2942" stroke-width="2" opacity="0.7">
+    <line x1="120" y1="92" x2="120" y2="176"/>
+    <line x1="174" y1="92" x2="174" y2="176"/>
+    <line x1="228" y1="92" x2="228" y2="176"/>
+    <line x1="282" y1="92" x2="282" y2="176"/>
+  </g>
+  <!-- mattress base -->
+  <rect x="54" y="150" width="292" height="70" rx="10" fill="#eee6d4"/>
+  <rect x="54" y="150" width="292" height="20" rx="10" fill="#f6efe1"/>
+  <!-- duvet fold -->
+  <path d="M54 196 q146 -22 292 0 v24 H54 Z" fill="#dccdb0"/>
+  <!-- gold throw blanket -->
+  <path d="M212 196 q70 -8 134 4 v20 H212 Z" fill="#c99a4b" opacity="0.9"/>
+  <!-- pillows -->
+  <rect x="76" y="138" width="86" height="40" rx="12" fill="#fbf7ee" transform="rotate(-3 119 158)"/>
+  <rect x="166" y="138" width="86" height="40" rx="12" fill="#f3ecda" transform="rotate(2 209 158)"/>
+  <!-- legs -->
+  <rect x="70" y="220" width="12" height="20" rx="3" fill="#b98a52"/>
+  <rect x="318" y="220" width="12" height="20" rx="3" fill="#b98a52"/>
+  <!-- moon accent -->
+  <path d="M330 52 a12 12 0 1 0 10 17 a9 9 0 1 1 -10 -17z" fill="#e0b968"/>
+</svg>
