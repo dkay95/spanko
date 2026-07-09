@@ -299,3 +299,52 @@ h1, h2, h3, h4 { font-family: var(--serif); font-weight: 600; line-height: 1.15;
   font-size: 1rem; cursor: pointer; transition: background .15s;
 }
 .spanko-chat #chatForm button:hover { background: var(--gold-light); }
+
+/* ============ SLOTH BUDDY (Animation) ============ */
+#slothWalker {
+  position: fixed; left: 0; bottom: 4px; width: 132px; z-index: 90;
+  pointer-events: none; will-change: transform;
+  transform: translateX(-180px);
+}
+#slothWalker svg { display: block; width: 100%; pointer-events: auto; cursor: pointer; }
+#slothWalker .pose { transition: opacity .5s ease; }
+#slothWalker #poseSleep { opacity: 0; }
+#slothWalker svg.sleeping #poseSleep { opacity: 1; }
+#slothWalker svg.sleeping #poseWalk { opacity: 0; }
+#slothWalker .leg { transform-box: fill-box; transform-origin: 50% 10%; }
+#slothWalker svg.walking .legA { animation: slothLegA .55s ease-in-out infinite; }
+#slothWalker svg.walking .legB { animation: slothLegB .55s ease-in-out infinite; }
+#slothWalker svg.walking { animation: slothBob .55s ease-in-out infinite; }
+#slothWalker svg.hop { animation: slothHop .4s ease-out; }
+@keyframes slothLegA { 0%, 100% { transform: rotate(18deg); } 50% { transform: rotate(-18deg); } }
+@keyframes slothLegB { 0%, 100% { transform: rotate(-18deg); } 50% { transform: rotate(18deg); } }
+@keyframes slothBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2.5px); } }
+@keyframes slothHop { 0%, 100% { transform: translateY(0); } 40% { transform: translateY(-16px); } }
+#slothWalker .zz { opacity: 0; }
+#slothWalker svg.sleeping .zz { animation: slothZ 2.4s ease-out infinite; }
+#slothWalker svg.sleeping .z2 { animation-delay: .8s; }
+#slothWalker svg.sleeping .z3 { animation-delay: 1.6s; }
+@keyframes slothZ {
+  0% { opacity: 0; transform: translateY(5px); }
+  30% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-10px); }
+}
+.sloth-side {
+  position: fixed; top: 36vh; width: 118px; height: 118px; z-index: 90;
+  pointer-events: none; transition: transform 1s cubic-bezier(.22,.9,.3,1.05);
+}
+.sloth-side img { width: 100%; display: block; }
+#peekL { left: 0; transform: translateX(-130px); }
+#peekL img { transform: rotate(90deg); }
+#peekL.show { transform: translateX(-30px); }
+#peekR { right: 0; transform: translateX(130px); }
+#peekR img { transform: rotate(-90deg); }
+#peekR.show { transform: translateX(30px); }
+@media (max-width: 560px) {
+  #slothWalker { width: 98px; }
+  .sloth-side { width: 90px; height: 90px; }
+  #peekL { transform: translateX(-100px); }
+  #peekL.show { transform: translateX(-24px); }
+  #peekR { transform: translateX(100px); }
+  #peekR.show { transform: translateX(24px); }
+}
