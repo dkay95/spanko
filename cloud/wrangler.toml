@@ -1,0 +1,13 @@
+name = "spanko-chat"
+main = "worker.js"
+compatibility_date = "2025-06-01"
+
+# Öffentliche Einstellungen (keine Geheimnisse!). Geheimnisse kommen per
+# `wrangler secret put NAME` dazu: CHAT_PASSWORD, OLLAMA_API_KEY, GH_TOKEN
+[vars]
+GH_OWNER = "dkay95"
+GH_REPO = "spanko"
+GH_BRANCH = "main"
+SITE_PREFIX = "site"
+OLLAMA_MODEL = "gpt-oss:120b"
+ALLOWED_ORIGIN = "https://dkay95.github.io"
