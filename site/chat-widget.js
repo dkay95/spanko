@@ -1,8 +1,19 @@
 (async function () {
   const CLOUD = (window.SPANKO_CHAT && window.SPANKO_CHAT.endpoint || '').replace(/\/+$/, '');
 
+  // --- Zugang im Cloud-Modus: geheimer Token aus dem Link (?studio=…) ---
+  // Nur wer den Link mit dem Token hat, sieht überhaupt den Chat. Ganz normale
+  // Shop-Besucher (ohne Token) bekommen kein Chat-Fenster zu sehen.
+  let cloudKey = '';
+  if (CLOUD) {
+    const p = new URLSearchParams(location.search).get('studio');
+    if (p) { cloudKey = p; localStorage.setItem('spankoStudioKey', p); }
+    else { cloudKey = localStorage.getItem('spankoStudioKey') || ''; }
+    if (!cloudKey) return; // öffentliche Kundenseite → kein Chat
+  }
+
   // --- Erreichbarkeit klären ---
-  // Cloud-Modus: Worker konfiguriert → Chat immer anzeigen.
+  // Cloud-Modus: Worker konfiguriert → Chat anzeigen.
   // Lokaler Modus: /api/chat auf demselben Server probieren; auf dem statischen
   // Host (404) bleibt der Chat unsichtbar.
   if (!CLOUD) {
@@ -97,29 +108,31 @@
 
   // ======================= CLOUD-MODUS =======================
   if (CLOUD) {
-    let pw = localStorage.getItem('spankoChatPw') || '';
-
-    function ensurePw() {
-      if (pw) return true;
-      const entered = prompt('Hasło / Passwort für den Design-Chat:');
-      if (entered == null || !entered.trim()) return false;
-      pw = entered.trim();
-      localStorage.setItem('spankoChatPw', pw);
-      return true;
-    }
+    let busy = false;
 
     async function callCloud(path, extra) {
       const r = await fetch(CLOUD + path, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ password: pw, ...extra }),
+        body: JSON.stringify({ password: cloudKey, ...extra }),
+        signal: AbortSignal.timeout(95_000),
       });
-      if (r.status === 401) {
-        pw = ''; localStorage.removeItem('spankoChatPw');
-        throw new Error('unauthorized');
-      }
+      if (r.status === 401) throw new Error('unauthorized');
       if (!r.ok) throw new Error('http ' + r.status);
       return r.json();
+    }
+
+    function showReloadButton() {
+      const d = document.createElement('div');
+      d.className = 'msg assistant';
+      d.innerHTML = '⏳ <b>Änderung gespeichert</b> — in ~1 Min live. ';
+      const b = document.createElement('button');
+      b.className = 'chat-reload';
+      b.textContent = 'Jetzt ansehen / Zobacz';
+      b.onclick = () => location.reload();
+      d.appendChild(b);
+      log.appendChild(d);
+      log.scrollTop = log.scrollHeight;
     }
 
     function afterReply(res) {
@@ -128,37 +141,50 @@
       if (res.failed && res.failed.length) parts.push('⚠️ ' + res.failed.join(' | '));
       addLocal(parts.filter(Boolean).join('\n'));
       if (res.committed) {
-        addLocal('⏳ Zmiany będą widoczne za ~1 min / Änderung ist in ~1 Min live. Odświeżę stronę / Ich lade neu…');
+        showReloadButton();
         sessionStorage.setItem('spankoChatOpen', panel.hidden ? '0' : '1');
-        setTimeout(() => location.reload(), 75_000);
+        setTimeout(() => location.reload(), 90_000); // Fallback, falls Button ungenutzt
       }
     }
 
     box.querySelector('#chatForm').onsubmit = async (e) => {
       e.preventDefault();
+      if (busy) return;
       const text = input.value.trim();
       if (!text) return;
-      if (!ensurePw()) return;
+      busy = true;
       input.value = '';
       render({ from: 'colleague', text });
       showTyping();
-      try { hideTyping(); afterReply(await callCloud('/chat', { text })); }
-      catch (err) {
+      try {
+        const res = await callCloud('/chat', { text });
         hideTyping();
+        afterReply(res);
+      } catch (err) {
+        hideTyping();
+        input.value = text; // Entwurf zurückgeben
         addLocal(err.message === 'unauthorized'
-          ? '🔒 Błędne hasło / Falsches Passwort — bitte erneut senden.'
-          : '⚠️ Fehler — Server nicht erreichbar.');
-      }
+          ? '🔒 Link ungültig / Nieprawidłowy link — bitte den richtigen Studio-Link öffnen.'
+          : '⚠️ Fehler — bitte erneut versuchen.');
+      } finally { busy = false; }
     };
 
     async function upload(file) {
-      if (!file || !file.type.startsWith('image/')) return;
-      if (!ensurePw()) return;
+      if (busy || !file || !file.type.startsWith('image/')) return;
+      busy = true;
       const dataUrl = await new Promise(res => { const fr = new FileReader(); fr.onload = () => res(fr.result); fr.readAsDataURL(file); });
       render({ from: 'colleague', image: dataUrl, text: '📷 ' + file.name });
       showTyping();
-      try { hideTyping(); afterReply(await callCloud('/upload', { name: file.name, dataUrl })); }
-      catch { hideTyping(); addLocal('⚠️ Foto-Upload fehlgeschlagen.'); }
+      try {
+        const res = await callCloud('/upload', { name: file.name, dataUrl });
+        hideTyping();
+        afterReply(res);
+      } catch (err) {
+        hideTyping();
+        addLocal(err.message === 'unauthorized'
+          ? '🔒 Link ungültig / Nieprawidłowy link.'
+          : '⚠️ Foto-Upload fehlgeschlagen.');
+      } finally { busy = false; }
     }
     const fileInput = box.querySelector('#chatFile');
     fileInput.onchange = () => { upload(fileInput.files[0]); fileInput.value = ''; };

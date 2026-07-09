@@ -2,14 +2,14 @@
 // ---------------------------------------
 // Immer-verfügbarer KI-Design-Chat für die auf GitHub Pages gehostete Website.
 // Ablauf pro Nachricht:
-//   1. Passwort prüfen
+//   1. Token prüfen (langer Zufalls-Token, steckt im Kollegen-Link)
 //   2. aktuelle Website-Dateien FRISCH aus dem GitHub-Repo lesen
 //   3. Ollama Cloud fragen (Struktur-Antwort mit reply + edits)
 //   4. Änderungen anwenden (edit = eindeutiges Suchen/Ersetzen, create = neue Datei)
 //   5. geänderte Dateien in EINEM Commit ins Repo schreiben  → Pages baut neu
 //
 // Secrets (via `wrangler secret put`):
-//   CHAT_PASSWORD   – geteiltes Passwort für den Chat
+//   CHAT_PASSWORD   – langer Zufalls-Token (== ?studio= im Link)
 //   OLLAMA_API_KEY  – Ollama-Cloud-Schlüssel
 //   GH_TOKEN        – GitHub-Token mit contents:write auf dem Repo
 // Variablen (wrangler.toml [vars]):
@@ -22,8 +22,12 @@ const MAX_FIND = 4000;
 const MAX_CONTENT = 120_000;
 const MAX_CONTEXT_FILE = 60_000;
 const MAX_CONTEXT_TOTAL = 300_000;
+const MAX_READ_FILES = 28;          // Deckel gegen das 50-Subrequest-Limit
 const MAX_TEXT = 4000;
 const MAX_IMAGE_BYTES = 5_000_000;
+const OLLAMA_TIMEOUT = 85_000;
+const GH_TIMEOUT = 20_000;
+const RATE_MAX = 30;                 // Anfragen pro Minute und IP (Isolate-lokal)
 
 // ---------- reine Logik (auch per Node-Test prüfbar) ----------
 
@@ -35,7 +39,6 @@ export function parseModelJson(content) {
   return { reply: clean };
 }
 
-// Pfad relativ zum Site-Ordner prüfen (kein Ausbruch, Textdatei, keine Uploads)
 export function safeRelPath(rel) {
   if (typeof rel !== 'string' || !rel.trim()) throw new Error('Datei fehlt');
   const parts = rel.replace(/\\/g, '/').split('/').filter(Boolean);
@@ -47,15 +50,12 @@ export function safeRelPath(rel) {
   return clean;
 }
 
-// Wendet edits auf eine Map {relPfad: Inhalt} an. Gibt geänderte Dateien +
-// Protokoll zurück. knownPaths = alle vorhandenen Pfade (für create-Check).
 export function applyEditsToFiles(files, edits, knownPaths) {
   const changed = {};
   const applied = [];
   const failed = [];
   if (!Array.isArray(edits)) return { changed, applied, failed };
   if (edits.length > MAX_EDITS) failed.push(`${edits.length - MAX_EDITS} pominięto / verworfen (Limit ${MAX_EDITS})`);
-  // Arbeitskopie, damit mehrere Edits derselben Datei aufeinander aufbauen
   const work = { ...files };
   for (const e of edits.slice(0, MAX_EDITS)) {
     try {
@@ -90,7 +90,7 @@ export function applyEditsToFiles(files, edits, knownPaths) {
   return { changed, applied, failed };
 }
 
-export function systemPrompt(files) {
+export function systemPrompt(files, skipped) {
   let budget = MAX_CONTEXT_TOTAL;
   const blocks = [];
   for (const [rel, content] of Object.entries(files)) {
@@ -99,6 +99,9 @@ export function systemPrompt(files) {
     budget -= content.length;
     blocks.push(`===== ${rel} =====\n${content}`);
   }
+  const note = (skipped && skipped.length)
+    ? `\n\n(Weitere Dateien sind vorhanden, aber hier nicht geladen: ${skipped.join(', ')}. Wenn der Nutzer eine davon ändern will, sag, dass du sie diesmal nicht geladen hast.)`
+    : '';
   return `You are the design assistant for the Spanko website (a Polish bedroom/mattress shop; navy+gold theme; sloth mascot; slogan "Sen ma znaczenie"). Visitors send design change requests in Polish or German. You can edit the whole website and create new files (e.g. sub-pages) inside the site folder.
 
 CRITICAL OUTPUT FORMAT: Respond with EXACTLY ONE JSON object and nothing else — no prose around it, no markdown fences:
@@ -119,7 +122,7 @@ Rules:
 
 Current website files:
 
-${blocks.join('\n\n')}`;
+${blocks.join('\n\n')}${note}`;
 }
 
 // ---------- GitHub-Anbindung ----------
@@ -135,64 +138,67 @@ function ghHeaders(env) {
 function ghUrl(env, p) { return `https://api.github.com/repos/${env.GH_OWNER}/${env.GH_REPO}/${p}`; }
 
 async function ghGet(env, p) {
-  const r = await fetch(ghUrl(env, p), { headers: ghHeaders(env) });
-  if (!r.ok) throw new Error(`GitHub GET ${p} → ${r.status}`);
+  const r = await fetch(ghUrl(env, p), { headers: ghHeaders(env), signal: AbortSignal.timeout(GH_TIMEOUT) });
+  if (!r.ok) { const e = new Error(`GitHub GET ${p} → ${r.status}`); e.status = r.status; throw e; }
   return r.json();
 }
-async function ghPost(env, p, bodyObj, method = 'POST') {
-  const r = await fetch(ghUrl(env, p), { method, headers: { ...ghHeaders(env), 'content-type': 'application/json' }, body: JSON.stringify(bodyObj) });
-  if (!r.ok) throw new Error(`GitHub ${method} ${p} → ${r.status} ${(await r.text()).slice(0, 160)}`);
+async function ghSend(env, p, bodyObj, method = 'POST') {
+  const r = await fetch(ghUrl(env, p), {
+    method, headers: { ...ghHeaders(env), 'content-type': 'application/json' },
+    body: JSON.stringify(bodyObj), signal: AbortSignal.timeout(GH_TIMEOUT),
+  });
+  if (!r.ok) { const e = new Error(`GitHub ${method} ${p} → ${r.status} ${(await r.text()).slice(0, 160)}`); e.status = r.status; throw e; }
   return r.json();
 }
 
-// Frische Website-Textdateien + Basis-Commit/Tree laden
-async function loadSite(env) {
+// Basis (Commit/Tree-SHA) laden; optional die Textdatei-Inhalte
+async function loadSite(env, withBlobs = true) {
   const prefix = (env.SITE_PREFIX || 'site').replace(/\/+$/, '');
   const branch = env.GH_BRANCH || 'main';
   const ref = await ghGet(env, `git/ref/heads/${branch}`);
   const headSha = ref.object.sha;
   const commit = await ghGet(env, `git/commits/${headSha}`);
   const baseTreeSha = commit.tree.sha;
-  const tree = await ghGet(env, `git/trees/${baseTreeSha}?recursive=1`);
+  const base = { headSha, baseTreeSha, prefix, branch, files: {}, knownPaths: new Set(), skipped: [] };
+  if (!withBlobs) return base;
 
-  const knownPaths = new Set();
+  const tree = await ghGet(env, `git/trees/${baseTreeSha}?recursive=1`);
   const textBlobs = [];
   for (const entry of tree.tree) {
     if (entry.type !== 'blob') continue;
     if (!entry.path.startsWith(prefix + '/')) continue;
     const rel = entry.path.slice(prefix.length + 1);
     if (rel.split('/').includes('uploads')) continue;
-    knownPaths.add(rel);
+    base.knownPaths.add(rel);
     const ext = rel.slice(rel.lastIndexOf('.')).toLowerCase();
     if (TEXT_EXT.includes(ext)) textBlobs.push({ rel, sha: entry.sha });
   }
-  // wichtige Dateien zuerst (kommen zuerst in den Kontext-Budget)
-  const rank = r => (r === 'index.html' ? 0 : r === 'styles.css' ? 1 : r === 'i18n.js' ? 2 : r.endsWith('.html') ? 3 : 4);
+  const rank = r => (r === 'index.html' ? 0 : r === 'styles.css' ? 1 : r === 'i18n.js' ? 2 : r.endsWith('.html') ? 3 : r.endsWith('.svg') ? 5 : 4);
   textBlobs.sort((a, b) => rank(a.rel) - rank(b.rel) || a.rel.localeCompare(b.rel));
 
-  const files = {};
-  for (const b of textBlobs) {
+  const toRead = textBlobs.slice(0, MAX_READ_FILES);
+  base.skipped = textBlobs.slice(MAX_READ_FILES).map(b => b.rel);
+  for (const b of toRead) {
     const blob = await ghGet(env, `git/blobs/${b.sha}`);
-    files[b.rel] = decodeBase64Utf8(blob.content);
+    base.files[b.rel] = decodeBase64Utf8(blob.content);
   }
-  return { headSha, baseTreeSha, prefix, branch, files, knownPaths };
+  return base;
 }
 
-// Geänderte/erzeugte Dateien als EIN Commit schreiben
 async function commitFiles(env, base, textChanges, binaryChanges, message) {
   const treeItems = [];
-  for (const [rel, content] of Object.entries(textChanges)) {
-    const blob = await ghPost(env, 'git/blobs', { content, encoding: 'utf-8' });
+  for (const [rel, content] of Object.entries(textChanges || {})) {
+    const blob = await ghSend(env, 'git/blobs', { content, encoding: 'utf-8' });
     treeItems.push({ path: `${base.prefix}/${rel}`, mode: '100644', type: 'blob', sha: blob.sha });
   }
   for (const [rel, b64] of Object.entries(binaryChanges || {})) {
-    const blob = await ghPost(env, 'git/blobs', { content: b64, encoding: 'base64' });
+    const blob = await ghSend(env, 'git/blobs', { content: b64, encoding: 'base64' });
     treeItems.push({ path: `${base.prefix}/${rel}`, mode: '100644', type: 'blob', sha: blob.sha });
   }
   if (!treeItems.length) return null;
-  const newTree = await ghPost(env, 'git/trees', { base_tree: base.baseTreeSha, tree: treeItems });
-  const newCommit = await ghPost(env, 'git/commits', { message, tree: newTree.sha, parents: [base.headSha] });
-  await ghPost(env, `git/refs/heads/${base.branch}`, { sha: newCommit.sha }, 'PATCH');
+  const newTree = await ghSend(env, 'git/trees', { base_tree: base.baseTreeSha, tree: treeItems });
+  const newCommit = await ghSend(env, 'git/commits', { message, tree: newTree.sha, parents: [base.headSha] });
+  await ghSend(env, `git/refs/heads/${base.branch}`, { sha: newCommit.sha }, 'PATCH');
   return newCommit.sha;
 }
 
@@ -226,6 +232,7 @@ async function askOllama(env, systemMsg, history) {
       stream: false, format: SCHEMA,
       messages: [{ role: 'system', content: systemMsg }, ...history],
     }),
+    signal: AbortSignal.timeout(OLLAMA_TIMEOUT),
   });
   if (!r.ok) throw new Error(`Ollama ${r.status} ${(await r.text()).slice(0, 160)}`);
   const data = await r.json();
@@ -239,6 +246,12 @@ function decodeBase64Utf8(b64) {
   const bytes = Uint8Array.from(bin, c => c.charCodeAt(0));
   return new TextDecoder().decode(bytes);
 }
+function safeEqual(a, b) {
+  if (typeof a !== 'string' || typeof b !== 'string' || a.length !== b.length) return false;
+  let r = 0;
+  for (let i = 0; i < a.length; i++) r |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return r === 0;
+}
 function cors(env) {
   return {
     'access-control-allow-origin': env.ALLOWED_ORIGIN || '*',
@@ -251,6 +264,17 @@ function json(obj, status, env) {
   return new Response(JSON.stringify(obj), { status, headers: { 'content-type': 'application/json', ...cors(env) } });
 }
 
+// einfache Isolate-lokale Drossel (Abwehr in der Tiefe; der Zufalls-Token ist der Hauptschutz)
+const rl = new Map();
+function rateLimited(ip) {
+  const now = Date.now();
+  let e = rl.get(ip);
+  if (!e || now > e.resetAt) { e = { count: 0, resetAt: now + 60_000 }; rl.set(ip, e); }
+  e.count++;
+  if (rl.size > 5000) rl.clear();
+  return e.count > RATE_MAX;
+}
+
 // ---------- HTTP-Handler ----------
 
 export default {
@@ -259,24 +283,40 @@ export default {
     if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors(env) });
     if (url.pathname === '/health') return json({ ok: true }, 200, env);
 
-    let payload;
-    try { payload = await request.json(); } catch { return json({ error: 'bad request' }, 400, env); }
-    if (!env.CHAT_PASSWORD || payload.password !== env.CHAT_PASSWORD) {
-      return json({ error: 'unauthorized' }, 401, env);
-    }
-
     try {
+      const ip = request.headers.get('cf-connecting-ip') || 'unknown';
+      if (rateLimited(ip)) return json({ error: 'too many requests' }, 429, env);
+
+      let payload;
+      try { payload = await request.json(); } catch { return json({ error: 'bad request' }, 400, env); }
+      if (!payload || typeof payload !== 'object' || Array.isArray(payload)) return json({ error: 'bad request' }, 400, env);
+      if (!env.CHAT_PASSWORD || !safeEqual(String(payload.password || ''), env.CHAT_PASSWORD)) {
+        return json({ error: 'unauthorized' }, 401, env);
+      }
+
       if (url.pathname === '/chat' && request.method === 'POST') {
         const text = typeof payload.text === 'string' ? payload.text.trim().slice(0, MAX_TEXT) : '';
         if (!text) return json({ error: 'empty text' }, 400, env);
-        const base = await loadSite(env);
-        const sys = systemPrompt(base.files);
+
+        const base = await loadSite(env, true);
+        const sys = systemPrompt(base.files, base.skipped);
         const out = await askOllama(env, sys, [{ role: 'user', content: text }]);
-        const { changed, applied, failed } = applyEditsToFiles(base.files, out.edits, base.knownPaths);
-        let committed = false;
-        if (Object.keys(changed).length) {
-          await commitFiles(env, base, changed, null, `chat: ${text.slice(0, 60)}`);
-          committed = true;
+
+        // Änderungen anwenden + committen; bei gleichzeitigem Commit (422) einmal frisch wiederholen
+        let applied, failed, committed = false;
+        for (let attempt = 0; attempt < 2; attempt++) {
+          const b = attempt === 0 ? base : await loadSite(env, true);
+          const res = applyEditsToFiles(b.files, out.edits, b.knownPaths);
+          applied = res.applied; failed = res.failed;
+          if (!Object.keys(res.changed).length) break;
+          try {
+            await commitFiles(env, b, res.changed, null, `chat: ${text.slice(0, 60)}`);
+            committed = true;
+            break;
+          } catch (err) {
+            if (err.status === 422 && attempt === 0) continue; // Rebase & retry
+            throw err;
+          }
         }
         return json({ reply: String(out.reply || '').trim(), applied, failed, committed }, 200, env);
       }
@@ -289,7 +329,7 @@ export default {
         if (bytes > MAX_IMAGE_BYTES) return json({ error: 'too large' }, 413, env);
         const safe = String(payload.name || 'foto').replace(/\.[^.]*$/, '').replace(/[^a-z0-9._-]+/gi, '-').slice(0, 40) || 'foto';
         const rel = `assets/uploads/${Date.now()}-${safe}.${ext}`;
-        const base = await loadSite(env);
+        const base = await loadSite(env, false); // Inhalte nicht nötig → spart Subrequests
         await commitFiles(env, base, {}, { [rel]: m[2] }, `chat: Foto ${safe}`);
         return json({ reply: `📷 ${payload.name || 'Foto'} → ${rel}`, applied: [rel], failed: [], committed: true, image: rel }, 200, env);
       }
