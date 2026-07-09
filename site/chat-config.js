@@ -7,5 +7,5 @@
 // enthält:  https://dkay95.github.io/spanko/?studio=DEIN-TOKEN
 // Ganz normale Shop-Besucher (ohne ?studio=…) sehen kein Chat-Fenster.
 window.SPANKO_CHAT = {
-  endpoint: '', // wird nach dem Cloudflare-Deploy auf die Worker-URL gesetzt
+  endpoint: 'https://spanko-chat.spanko-dkay.workers.dev',
 };
