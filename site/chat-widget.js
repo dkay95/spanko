@@ -30,15 +30,36 @@
   const panel = box.querySelector('#chatPanel');
   const drop = box.querySelector('#chatDrop');
   let since = 0;
+  let booted = false;        // erste Abfrage = alte Historie (löst kein Neuladen aus)
+  let typingEl = null;
   const seen = new Set();
+
+  // Chat nach einem automatischen Neuladen wieder öffnen
+  if (sessionStorage.getItem('spankoChatOpen') === '1') {
+    sessionStorage.removeItem('spankoChatOpen');
+    panel.hidden = false;
+  }
 
   box.querySelector('#chatFab').onclick = () => { panel.hidden = !panel.hidden; };
   box.querySelector('#chatClose').onclick = () => { panel.hidden = true; };
 
-  function add(m) {
+  function showTyping() {
+    if (typingEl) return;
+    typingEl = document.createElement('div');
+    typingEl.className = 'msg assistant typing';
+    typingEl.textContent = '🦥 …';
+    log.appendChild(typingEl);
+    log.scrollTop = log.scrollHeight;
+  }
+  function hideTyping() {
+    if (typingEl) { typingEl.remove(); typingEl = null; }
+  }
+
+  function add(m, live) {
     const key = m.ts + m.from + (m.text || '') + (m.image || '');
     if (seen.has(key)) return;
     seen.add(key);
+    if (m.from === 'assistant') hideTyping();
     const d = document.createElement('div');
     d.className = 'msg ' + m.from;
     if (m.image) {
@@ -54,9 +75,16 @@
     }
     log.appendChild(d);
     log.scrollTop = log.scrollHeight;
+
+    // Nach einer angewendeten Design-Änderung Seite neu laden (nur bei frisch
+    // eingetroffenen Nachrichten, nicht beim Nachladen der Historie)
+    if (live && m.reload && m.from === 'assistant') {
+      sessionStorage.setItem('spankoChatOpen', panel.hidden ? '0' : '1');
+      setTimeout(() => location.reload(), 1600);
+    }
   }
 
-  // send text
+  // Text senden
   box.querySelector('#chatForm').onsubmit = async (e) => {
     e.preventDefault();
     const input = box.querySelector('#chatInput');
@@ -70,13 +98,14 @@
         body: JSON.stringify({ text }),
       });
       const m = await r.json();
-      add(m); since = Math.max(since, m.ts);
+      add(m, true); since = Math.max(since, m.ts);
+      if (m.aiPending) showTyping();
     } catch {
-      add({ ts: Date.now(), from: 'assistant', text: '(offline — Server nicht erreichbar)' });
+      add({ ts: Date.now(), from: 'assistant', text: '(offline — Server nicht erreichbar)' }, true);
     }
   };
 
-  // upload a photo
+  // Foto hochladen
   async function upload(file) {
     if (!file || !file.type.startsWith('image/')) return;
     const dataUrl = await new Promise(res => {
@@ -92,16 +121,17 @@
       });
       if (!r.ok) throw new Error();
       const m = await r.json();
-      add(m); since = Math.max(since, m.ts);
+      add(m, true); since = Math.max(since, m.ts);
+      if (m.aiPending) showTyping();
     } catch {
-      add({ ts: Date.now(), from: 'assistant', text: '(Foto-Upload fehlgeschlagen)' });
+      add({ ts: Date.now(), from: 'assistant', text: '(Foto-Upload fehlgeschlagen)' }, true);
     }
   }
 
   const fileInput = box.querySelector('#chatFile');
   fileInput.onchange = () => { upload(fileInput.files[0]); fileInput.value = ''; };
 
-  // drag & drop onto the panel
+  // Drag & Drop auf das Chat-Fenster
   panel.addEventListener('dragover', e => { e.preventDefault(); drop.hidden = false; });
   panel.addEventListener('dragleave', e => { if (e.target === panel || e.target === drop) drop.hidden = true; });
   panel.addEventListener('drop', e => {
@@ -113,7 +143,9 @@
     try {
       const r = await fetch('/api/chat?since=' + since);
       const { messages } = await r.json();
-      messages.forEach(m => { add(m); since = Math.max(since, m.ts); });
+      const live = booted;
+      messages.forEach(m => { add(m, live); since = Math.max(since, m.ts); });
+      booted = true;
     } catch {}
   }
   setInterval(poll, 3000);

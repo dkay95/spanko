@@ -9,10 +9,11 @@ function ensure() {
   if (!fs.existsSync(FILE)) fs.writeFileSync(FILE, '');
 }
 
-function appendMessage({ from, text, image }) {
+function appendMessage({ from, text, image, reload }) {
   ensure();
   const msg = { ts: Date.now(), from, text: String(text || '') };
   if (image) msg.image = image;
+  if (reload) msg.reload = true;
   fs.appendFileSync(FILE, JSON.stringify(msg) + '\n');
   return msg;
 }

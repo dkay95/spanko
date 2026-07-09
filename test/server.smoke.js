@@ -4,7 +4,7 @@ const path = require('path');
 
 const PORT = 4399;
 const srv = spawn('node', [path.join(__dirname, '../server/server.js')], {
-  env: { ...process.env, PORT: String(PORT), CHAT_DIR: path.join(__dirname, '../.chat-test') },
+  env: { ...process.env, PORT: String(PORT), CHAT_DIR: path.join(__dirname, '../.chat-test'), OLLAMA_API_KEY: '' },
   stdio: 'inherit',
 });
 

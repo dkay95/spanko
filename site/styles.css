@@ -277,6 +277,8 @@ h1, h2, h3, h4 { font-family: var(--serif); font-weight: 600; line-height: 1.15;
 .spanko-chat .msg.colleague { align-self: flex-end; background: var(--gold); color: #23180a; border-bottom-right-radius: 4px; }
 .spanko-chat .msg.assistant { align-self: flex-start; background: var(--navy-soft); color: var(--text-dark); border-bottom-left-radius: 4px; }
 .spanko-chat .msg-img { display: block; max-width: 100%; border-radius: 8px; margin-bottom: 4px; }
+.spanko-chat .msg.typing { opacity: .7; animation: chatTyping 1.2s ease-in-out infinite; }
+@keyframes chatTyping { 0%, 100% { opacity: .45; } 50% { opacity: .9; } }
 .spanko-chat #chatDrop {
   position: absolute; left: 12px; right: 12px; bottom: 70px; z-index: 2;
   padding: 16px; text-align: center; font-size: .82rem; color: var(--gold-light);

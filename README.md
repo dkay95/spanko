@@ -19,6 +19,28 @@ bash scripts/start.sh
 - Ist `cloudflared` installiert, erscheint zusätzlich ein öffentlicher Link wie
   `https://irgendwas.trycloudflare.com`. **Diesen Link schickst du deinem Kollegen.**
 
+## KI-Chat: Ollama Cloud (optional)
+
+Der Chat kann statt der Claude-Brücke auch **vollautomatisch** von einer KI
+(Ollama Cloud) beantwortet werden — sie ändert das Design dann selbstständig.
+
+**Einrichten (einmalig):**
+1. Kostenlosen Account anlegen auf **https://ollama.com**
+2. Dort unter *Settings → API Keys* einen Schlüssel erstellen
+3. Den Schlüssel in eine Datei namens **`ollama.key`** im Projektordner legen
+   (nur der Schlüssel, eine Zeile — die Datei ist per .gitignore geschützt und
+   landet nie auf GitHub)
+4. Server neu starten (`bash scripts/start.sh`)
+
+Beim Start steht dann im Terminal: „KI-Chat aktiv". Ab da gilt:
+- Jede Chat-Nachricht wird von der KI beantwortet (Modell standardmäßig
+  `gpt-oss:120b`, änderbar über die Umgebungsvariable `OLLAMA_MODEL`).
+- Die KI darf **nur** `site/styles.css`, `site/index.html` und `site/i18n.js`
+  ändern — sonst nichts (Whitelist im Server).
+- Vor jeder Änderung wird ein **Backup** nach `.chat/backups/` gelegt.
+- Nach einer Änderung lädt die Seite beim Kollegen automatisch neu.
+- Ohne `ollama.key` bleibt alles wie bisher (Brücke zur Claude-Session).
+
 ## Wie der Design-Chat funktioniert
 
 1. Dein Kollege öffnet den Link und klickt unten rechts auf **💬**.

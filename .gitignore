@@ -1,5 +1,7 @@
 node_modules/
 .chat/
 .chat-test/
+.chat-test-ai/
 site/assets/uploads/
+ollama.key
 *.log
