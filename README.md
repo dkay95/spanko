@@ -1,9 +1,49 @@
-# Spanko — Design-Website mit Chat-Brücke
+# Spanko — Design-Website mit KI-Design-Chat
 
 Eine zweisprachige (Polnisch / Deutsch) Design-Website für den Schlafzimmer-Shop
-**Spanko**. Noch ohne echte Shop-Funktion — es geht um das Aussehen. Dazu ein
-Chat-Fenster, über das ein Kollege Änderungswünsche schicken kann, die direkt in der
-laufenden Claude-Code-Session (bei dir) ankommen.
+**Spanko**. Über einen geheimen Link kann ein Kollege der Seite per Chat
+Design-Wünsche schicken; eine KI (Ollama Cloud) setzt sie um. Alles läuft
+dauerhaft in der Cloud — **kein eingeschalteter Mac nötig**.
+
+## 🌍 Immer verfügbar (so läuft es im Normalbetrieb)
+
+- **Öffentliche Seite (für Kunden):** https://dkay95.github.io/spanko/
+  (GitHub Pages, 24/7 online, ohne Chat sichtbar)
+- **Design-Chat (für den Kollegen):** derselbe Link **mit geheimem Token**:
+  `https://dkay95.github.io/spanko/?studio=DEIN-TOKEN`
+  Nur wer diesen Link hat, sieht das Chat-Fenster. Der Token liegt lokal in
+  `.secrets/studio_token` (nicht im Repo).
+
+**Ablauf:** Kollege schreibt im Chat → Cloudflare-Worker
+(`spanko-chat.spanko-dkay.workers.dev`) fragt Ollama Cloud → wendet die Änderung an
+→ committet sie ins GitHub-Repo → GitHub Actions baut die Seite neu → nach ~1 Min live.
+
+**Bausteine (alles in der Cloud):**
+| Teil | Wo | Aufgabe |
+|------|-----|---------|
+| Website | GitHub Pages | liefert die Seite aus (`.github/workflows/pages.yml`) |
+| KI-Gehirn | Cloudflare Worker (`cloud/worker.js`) | Chat, Ollama, schreibt ins Repo |
+| Speicher | GitHub-Repo `dkay95/spanko` | Quelle der Wahrheit; jede Änderung = Commit |
+
+**Geheimnisse** (nur im Worker, verschlüsselt — nie im Repo): `CHAT_PASSWORD`
+(= Link-Token), `OLLAMA_API_KEY`, `GH_TOKEN` (classic, Scope `repo`).
+Ändern per `cd cloud && npx wrangler secret put NAME`.
+
+**Etwas zurücknehmen?** Jede KI-Änderung ist ein Git-Commit. Rückgängig:
+`git fetch origin main && git reset --hard origin/main && git revert --no-edit HEAD && git push`
+(oder einfach den Kollegen bitten, es zurück-zu-ändern).
+
+**Worker neu veröffentlichen** (nach Code-Änderung an `cloud/worker.js`):
+`cd cloud && npx wrangler deploy`
+
+---
+
+## Lokaler Modus (Entwicklung / ohne Cloud)
+
+Zusätzlich gibt es einen lokalen Modus: Chat-Fenster, das Änderungswünsche direkt
+in eine laufende Claude-Code-Session (oder an lokales Ollama) gibt. Läuft nur,
+solange dein Mac + der Server an sind. Aktiv, wenn `site/chat-config.js` **kein**
+`endpoint` gesetzt hat.
 
 ## Was du brauchst
 - **Node.js** (schon installiert, wenn dieses Projekt gebaut wurde).
