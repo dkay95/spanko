@@ -47,7 +47,7 @@ const STRINGS = {
     foot_about: 'O nas', foot_delivery: 'Dostawa i płatności', foot_returns: 'Zwroty i reklamacje',
     foot_terms: 'Regulamin', foot_privacy: 'Polityka prywatności',
     foot_faq: 'FAQ', foot_guide: 'Poradnik',
-    foot_rights: '© 2026 Spanko. Wszelkie prawa zastrzeżone.',
+    foot_rights: '© 2027 Spanko. Wszelkie prawa zastrzeżone.',
     // chat widget
     chat_title: 'Spanko — Czat projektowy',
     chat_placeholder: 'Napisz wiadomość…',
@@ -91,7 +91,7 @@ const STRINGS = {
     foot_about: 'Über uns', foot_delivery: 'Lieferung & Zahlung', foot_returns: 'Rückgabe & Reklamation',
     foot_terms: 'AGB', foot_privacy: 'Datenschutz',
     foot_faq: 'FAQ', foot_guide: 'Ratgeber',
-    foot_rights: '© 2026 Spanko. Alle Rechte vorbehalten.',
+    foot_rights: '© 2027 Spanko. Alle Rechte vorbehalten.',
     chat_title: 'Spanko — Design-Chat',
     chat_placeholder: 'Nachricht schreiben…',
   },
