@@ -74,7 +74,11 @@ function req(method, urlPath, bodyObj) {
 }
 
 (async () => {
-  await new Promise(r => setTimeout(r, 600));
+  // warten, bis der Server wirklich antwortet (statt fester Wartezeit)
+  for (let i = 0; i < 50; i++) {
+    try { await req('GET', '/api/chat?since=0'); break; }
+    catch { await new Promise(r => setTimeout(r, 200)); }
+  }
   let ok = true;
   const fail = (msg, extra) => { ok = false; console.error('FEHLER:', msg, extra || ''); };
 

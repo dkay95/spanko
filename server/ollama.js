@@ -63,6 +63,7 @@ const SCHEMA = {
     reply: { type: 'string' },
     edits: {
       type: 'array',
+      maxItems: MAX_EDITS,
       items: {
         type: 'object',
         properties: {
@@ -89,8 +90,12 @@ function systemPrompt() {
 
   return `You are the design assistant for the Spanko website (a Polish bedroom/mattress shop; navy+gold theme; sloth mascot; slogan "Sen ma znaczenie"). Site visitors send design change requests in Polish or German. You can edit the entire website: every file below, and you can create new files (e.g. sub-pages) inside the site folder.
 
+CRITICAL OUTPUT FORMAT: Respond with EXACTLY ONE JSON object and nothing else — no prose around it, no markdown fences. Shape:
+{"reply": "<short message to the user in their language>", "edits": [ ... ]}
+Omit "edits" (or use []) when no file change is needed.
+
 How to change things — return "edits", each item is one of:
-- {"op":"edit","file":"<path>","find":"<exact substring copied verbatim from the file below>","replace":"<new text>"} — replaces the first occurrence. "find" must be short but unique within its file. Never invent text that is not literally in the file.
+- {"op":"edit","file":"<path>","find":"<exact substring copied verbatim from the file below>","replace":"<new text>"} — "find" MUST occur exactly once in the file (edits with ambiguous "find" are rejected — then retry with a longer, unique snippet). Never invent text that is not literally in the file.
 - {"op":"create","file":"<new path like pages/betten.html>","content":"<full file content>"} — creates a new file (fails if it already exists; to change an existing file use "edit").
 
 Rules:
@@ -138,19 +143,51 @@ async function chat(history) {
       throw new Error(`Ollama HTTP ${res.status} ${detail}`);
     }
     const data = await res.json();
-    return JSON.parse(data.message.content);
+    return parseModelJson(String((data.message && data.message.content) || ''));
   } finally {
     clearTimeout(timer);
   }
 }
 
+// Modell-Antwort robust einlesen: idealerweise JSON; sonst JSON aus dem Text
+// herausschälen (auch aus Markdown-Zäunen); zur Not als reine Textantwort werten.
+function parseModelJson(content) {
+  const clean = content.replace(/^\s*```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '').trim();
+  try {
+    const o = JSON.parse(clean);
+    if (o && typeof o === 'object' && 'reply' in o) return o;
+  } catch {}
+  const m = clean.match(/\{[\s\S]*\}/);
+  if (m) {
+    try {
+      const o = JSON.parse(m[0]);
+      if (o && typeof o === 'object' && 'reply' in o) return o;
+    } catch {}
+  }
+  return { reply: clean };
+}
+
+// Atomar schreiben (temp + rename): Leser sehen nie eine halbe Datei
+function writeAtomic(p, content) {
+  const tmp = p + '.tmp-' + process.pid;
+  fs.writeFileSync(tmp, content);
+  fs.renameSync(tmp, p);
+}
+
 // Wendet die vom Modell vorgeschlagenen Änderungen an — streng validiert,
-// mit Backup der Vorversion bei jeder Bearbeitung.
+// mit Backup der Vorversion (einmal pro Datei und Runde).
 function applyEdits(edits) {
   const applied = [];
   const failed = [];
   if (!Array.isArray(edits)) return { applied, failed };
+  if (edits.length > MAX_EDITS) {
+    failed.push(`${edits.length - MAX_EDITS} pominięto / Änderung(en) verworfen (Limit ${MAX_EDITS})`);
+  }
+  const backedUp = new Set();
+  const runId = Date.now();
+  let idx = 0;
   for (const e of edits.slice(0, MAX_EDITS)) {
+    idx++;
     try {
       if (!e || typeof e !== 'object') throw new Error('ungültige Änderung');
       const p = resolveSite(e.file);
@@ -161,17 +198,22 @@ function applyEdits(edits) {
         if (e.content.length > MAX_CONTENT) throw new Error('Datei zu groß');
         if (fs.existsSync(p)) throw new Error('Datei existiert schon (op:edit benutzen)');
         fs.mkdirSync(path.dirname(p), { recursive: true });
-        fs.writeFileSync(p, e.content);
+        writeAtomic(p, e.content);
         applied.push(rel + ' (neu)');
       } else if (e.op === 'edit') {
         if (typeof e.find !== 'string' || typeof e.replace !== 'string') throw new Error('find/replace fehlt');
         if (!e.find || e.find.length > MAX_FIND || e.replace.length > MAX_FIND) throw new Error('Änderung zu groß');
         const src = fs.readFileSync(p, 'utf8');
         const i = src.indexOf(e.find);
-        if (i < 0) throw new Error('Suchtext nicht gefunden');
-        fs.mkdirSync(BACKUP_DIR, { recursive: true });
-        fs.writeFileSync(path.join(BACKUP_DIR, `${Date.now()}-${rel.replace(/[\\/]/g, '_')}`), src);
-        fs.writeFileSync(p, src.slice(0, i) + e.replace + src.slice(i + e.find.length));
+        if (i < 0) throw new Error('nie znaleziono / Suchtext nicht gefunden');
+        if (src.indexOf(e.find, i + e.find.length) !== -1) throw new Error('Suchtext nicht eindeutig — längeren wählen');
+        // Backup: der Zustand VOR der Runde, einmal pro Datei
+        if (!backedUp.has(rel)) {
+          fs.mkdirSync(BACKUP_DIR, { recursive: true });
+          fs.writeFileSync(path.join(BACKUP_DIR, `${runId}-${idx}-${rel.replace(/[\\/]/g, '_')}`), src);
+          backedUp.add(rel);
+        }
+        writeAtomic(p, src.slice(0, i) + e.replace + src.slice(i + e.find.length));
         applied.push(rel);
       } else {
         throw new Error('unbekannte Operation');
