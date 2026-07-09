@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 130" aria-hidden="true">
+  <!-- Kopf (lugt über die Kante) -->
+  <circle cx="120" cy="66" r="42" fill="#f4e8d0" stroke="#b98a52" stroke-width="3.5"/>
+  <!-- Haarbüschel -->
+  <path d="M104 28 q6 -7 14 -5" fill="none" stroke="#b98a52" stroke-width="2.4" stroke-linecap="round" opacity=".55"/>
+  <path d="M126 25 q7 -3 12 2" fill="none" stroke="#b98a52" stroke-width="2.4" stroke-linecap="round" opacity=".55"/>
+  <!-- Augenflecken -->
+  <ellipse cx="103" cy="62" rx="9.5" ry="14" fill="#a5906f" opacity=".75" transform="rotate(-18 103 62)"/>
+  <ellipse cx="137" cy="62" rx="9.5" ry="14" fill="#a5906f" opacity=".75" transform="rotate(18 137 62)"/>
+  <!-- offene, neugierige Augen -->
+  <circle cx="103" cy="63" r="4.6" fill="#3c2f1e"/>
+  <circle cx="137" cy="63" r="4.6" fill="#3c2f1e"/>
+  <circle cx="104.6" cy="61.4" r="1.6" fill="#fff"/>
+  <circle cx="138.6" cy="61.4" r="1.6" fill="#fff"/>
+  <!-- Nase + Lächeln -->
+  <ellipse cx="120" cy="80" rx="4.4" ry="3.4" fill="#5a4632"/>
+  <path d="M114.5 87 q5.5 4.5 11 0" fill="none" stroke="#5a4632" stroke-width="2.6" stroke-linecap="round"/>
+  <!-- Bäckchen -->
+  <circle cx="90" cy="80" r="3.8" fill="#e8b27d" opacity=".5"/>
+  <circle cx="150" cy="80" r="3.8" fill="#e8b27d" opacity=".5"/>
+  <!-- Pfoten auf der Kante -->
+  <rect x="60" y="98" width="36" height="20" rx="10" fill="#f4e8d0" stroke="#b98a52" stroke-width="3"/>
+  <rect x="144" y="98" width="36" height="20" rx="10" fill="#f4e8d0" stroke="#b98a52" stroke-width="3"/>
+  <g stroke="#b98a52" stroke-width="2" opacity=".6">
+    <line x1="71" y1="101" x2="71" y2="112"/>
+    <line x1="80" y1="101" x2="80" y2="113"/>
+    <line x1="155" y1="101" x2="155" y2="112"/>
+    <line x1="164" y1="101" x2="164" y2="113"/>
+  </g>
+</svg>

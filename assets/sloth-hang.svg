@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 190 250" aria-hidden="true">
+  <!-- goldener Ring -->
+  <circle cx="95" cy="62" r="42" fill="none" stroke="#c99a4b" stroke-width="3"/>
+  <!-- Blätter am Ring -->
+  <path d="M128 26 q14 -10 22 -2 q-10 10 -22 2z" fill="#2f7d4f"/>
+  <path d="M132 32 q16 2 18 12 q-14 2 -18 -12z" fill="#3a9b62"/>
+  <!-- Stern -->
+  <path d="M42 24 l1.8 4 4 1.8 -4 1.8 -1.8 4 -1.8 -4 -4 -1.8 4 -1.8 z" fill="#c99a4b"/>
+
+  <!-- Arme (greifen den Ring) -->
+  <path d="M72 94 Q62 120 78 140" fill="none" stroke="#a87c42" stroke-width="14" stroke-linecap="round"/>
+  <path d="M72 94 Q62 120 78 140" fill="none" stroke="#eedcba" stroke-width="9" stroke-linecap="round"/>
+  <path d="M120 92 Q130 118 114 138" fill="none" stroke="#a87c42" stroke-width="14" stroke-linecap="round"/>
+  <path d="M120 92 Q130 118 114 138" fill="none" stroke="#eedcba" stroke-width="9" stroke-linecap="round"/>
+  <!-- Pfoten am Ring -->
+  <circle cx="72" cy="93" r="7.5" fill="#eedcba" stroke="#a87c42" stroke-width="2.5"/>
+  <circle cx="120" cy="91" r="7.5" fill="#eedcba" stroke="#a87c42" stroke-width="2.5"/>
+
+  <!-- Körper -->
+  <ellipse cx="96" cy="176" rx="34" ry="46" fill="#eedcba" stroke="#a87c42" stroke-width="3"/>
+  <ellipse cx="96" cy="188" rx="20" ry="27" fill="#f8efdc"/>
+
+  <!-- Füße -->
+  <circle cx="80" cy="216" r="8.5" fill="#eedcba" stroke="#a87c42" stroke-width="2.5"/>
+  <circle cx="112" cy="216" r="8.5" fill="#eedcba" stroke="#a87c42" stroke-width="2.5"/>
+
+  <!-- Kopf -->
+  <circle cx="96" cy="140" r="27" fill="#eedcba" stroke="#a87c42" stroke-width="3"/>
+  <ellipse cx="85.5" cy="138" rx="7" ry="10.5" fill="#a5906f" opacity=".75" transform="rotate(-18 85.5 138)"/>
+  <ellipse cx="106.5" cy="138" rx="7" ry="10.5" fill="#a5906f" opacity=".75" transform="rotate(18 106.5 138)"/>
+  <path d="M82 138 q3.5 3.5 7 0" fill="none" stroke="#5a4632" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M103 138 q3.5 3.5 7 0" fill="none" stroke="#5a4632" stroke-width="2.2" stroke-linecap="round"/>
+  <ellipse cx="96" cy="148" rx="3.4" ry="2.6" fill="#5a4632"/>
+  <path d="M92.5 154 q3.5 3 7 0" fill="none" stroke="#5a4632" stroke-width="2.2" stroke-linecap="round"/>
+  <circle cx="77" cy="148" r="2.8" fill="#e8b27d" opacity=".5"/>
+  <circle cx="115" cy="148" r="2.8" fill="#e8b27d" opacity=".5"/>
+</svg>
