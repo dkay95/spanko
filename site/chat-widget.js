@@ -110,11 +110,25 @@
   if (CLOUD) {
     let busy = false;
 
+    // Gesprächsverlauf für den KI-Kontext — übersteht das Auto-Neuladen
+    let convo = [];
+    try { convo = JSON.parse(sessionStorage.getItem('spankoConvo') || '[]'); } catch { convo = []; }
+    if (Array.isArray(convo)) {
+      // frühere Nachrichten wieder anzeigen (ohne erneutes Speichern)
+      convo.slice(-12).forEach(m => render({ from: m.role === 'user' ? 'colleague' : 'assistant', text: m.content }));
+    } else { convo = []; }
+    function remember(role, content) {
+      if (!content) return;
+      convo.push({ role, content });
+      convo = convo.slice(-20);
+      try { sessionStorage.setItem('spankoConvo', JSON.stringify(convo)); } catch {}
+    }
+
     async function callCloud(path, extra) {
       const r = await fetch(CLOUD + path, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ password: cloudKey, ...extra }),
+        body: JSON.stringify({ password: cloudKey, history: convo.slice(-12), ...extra }),
         signal: AbortSignal.timeout(95_000),
       });
       if (r.status === 401) throw new Error('unauthorized');
@@ -136,6 +150,7 @@
     }
 
     function afterReply(res) {
+      remember('assistant', String(res.reply || '').trim());
       const parts = [String(res.reply || '').trim()];
       if (res.applied && res.applied.length) parts.push('🔧 ' + res.applied.join(', '));
       if (res.failed && res.failed.length) parts.push('⚠️ ' + res.failed.join(' | '));
@@ -157,8 +172,9 @@
       render({ from: 'colleague', text });
       showTyping();
       try {
-        const res = await callCloud('/chat', { text });
+        const res = await callCloud('/chat', { text }); // sendet bisherigen convo
         hideTyping();
+        remember('user', text);
         afterReply(res);
       } catch (err) {
         hideTyping();
@@ -178,6 +194,7 @@
       try {
         const res = await callCloud('/upload', { name: file.name, dataUrl });
         hideTyping();
+        remember('user', '📷 ' + file.name + (res.image ? ' → ' + res.image : ''));
         afterReply(res);
       } catch (err) {
         hideTyping();

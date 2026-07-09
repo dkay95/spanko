@@ -1,6 +1,6 @@
 // Testet die reine Logik des Cloudflare Workers (ohne Netz/Cloud):
 // Edit-Anwendung, create, Pfad-Härtung, Eindeutigkeitsprüfung, JSON-Parsing.
-import { applyEditsToFiles, safeRelPath, parseModelJson, systemPrompt } from '../cloud/worker.js';
+import { applyEditsToFiles, safeRelPath, parseModelJson, systemPrompt, sanitizeHistory } from '../cloud/worker.js';
 
 let ok = true;
 const eq = (name, got, want) => {
@@ -68,6 +68,18 @@ const many = Array.from({ length: 12 }, (_, i) => ({ op: 'create', file: `pages/
 r = applyEditsToFiles(files, many, known);
 truthy('limit-applied', r.applied.length === 10);
 truthy('limit-warned', r.failed.some(f => /verworfen|pominięto/.test(f)));
+
+// --- sanitizeHistory ---
+eq('hist-empty', sanitizeHistory(undefined), []);
+eq('hist-valid', sanitizeHistory([{ role: 'user', content: 'hallo' }, { role: 'assistant', content: 'hi' }]),
+  [{ role: 'user', content: 'hallo' }, { role: 'assistant', content: 'hi' }]);
+eq('hist-filter-badrole', sanitizeHistory([{ role: 'system', content: 'x' }, { role: 'user', content: 'y' }]),
+  [{ role: 'user', content: 'y' }]);
+eq('hist-filter-empty', sanitizeHistory([{ role: 'user', content: '   ' }, { role: 'user', content: 'z' }]),
+  [{ role: 'user', content: 'z' }]);
+truthy('hist-cap-12', sanitizeHistory(Array.from({ length: 30 }, () => ({ role: 'user', content: 'a' }))).length === 12);
+truthy('hist-nonarray', sanitizeHistory('nope').length === 0);
+truthy('hist-content-trim', sanitizeHistory([{ role: 'user', content: 'x'.repeat(9999) }])[0].content.length === 4000);
 
 // --- systemPrompt enthält die Dateien ---
 const sp = systemPrompt(files);

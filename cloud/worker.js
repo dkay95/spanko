@@ -39,6 +39,16 @@ export function parseModelJson(content) {
   return { reply: clean };
 }
 
+// Gesprächsverlauf vom Client säubern: nur user/assistant, Text begrenzt,
+// höchstens die letzten 12 Beiträge (der aktuelle Text kommt separat dazu).
+export function sanitizeHistory(raw) {
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .filter(m => m && (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string' && m.content.trim())
+    .slice(-12)
+    .map(m => ({ role: m.role, content: m.content.slice(0, MAX_TEXT) }));
+}
+
 export function safeRelPath(rel) {
   if (typeof rel !== 'string' || !rel.trim()) throw new Error('Datei fehlt');
   const parts = rel.replace(/\\/g, '/').split('/').filter(Boolean);
@@ -113,12 +123,16 @@ Each edit is one of:
 - {"op":"create","file":"<new path e.g. pages/betten.html>","content":"<full file content>"} — creates a new file (fails if it exists).
 
 Rules:
+- You receive the recent CONVERSATION HISTORY. Use it: resolve references like "no, I meant the other one", "make it bigger", "surprise me" from the earlier turns. Do NOT ask a question the user already answered above.
+- BIAS TO ACTION: when the intent is reasonably clear from the conversation, MAKE the change (return edits) instead of asking for more details. Only ask back if a request is genuinely ambiguous or you truly cannot locate what is meant. "Surprise me" / "überrasch mich" = pick a sensible concrete improvement and do it.
+- After acting, your reply briefly states what you changed (1 sentence), in the user's language.
 - Reply in the same language as the user's last message (Polish or German). Keep replies short and friendly.
 - At most ${MAX_EDITS} edits per reply. Change only what the user asked for.
 - Page texts exist in Polish AND German (i18n.js): when changing wording, update BOTH languages.
 - New HTML pages must include <link rel="stylesheet" href="styles.css"> (adjust the relative path in subfolders) and follow the existing design.
-- BE CAREFUL with chat-widget.js, chat-config.js and sloth-buddy.js: breaking them breaks the chat itself. Avoid unless explicitly asked.
-- If a request is unclear, off-topic or dangerous, ask back or decline — without edits.
+- The little animated sloth mascot lives in sloth-buddy.js (inline SVG in the poseWalk/poseSleep groups). You MAY edit its SVG when asked to change how it looks — carefully, keeping the file valid.
+- BE CAREFUL with chat-widget.js and chat-config.js: breaking them breaks the chat itself. Avoid unless explicitly asked.
+- If a request is truly unclear, off-topic or dangerous, ask back or decline — without edits.
 
 Current website files:
 
@@ -287,6 +301,9 @@ export default {
       const ip = request.headers.get('cf-connecting-ip') || 'unknown';
       if (rateLimited(ip)) return json({ error: 'too many requests' }, 429, env);
 
+      const clen = Number(request.headers.get('content-length') || 0);
+      if (clen > 8_000_000) return json({ error: 'too large' }, 413, env);
+
       let payload;
       try { payload = await request.json(); } catch { return json({ error: 'bad request' }, 400, env); }
       if (!payload || typeof payload !== 'object' || Array.isArray(payload)) return json({ error: 'bad request' }, 400, env);
@@ -298,9 +315,10 @@ export default {
         const text = typeof payload.text === 'string' ? payload.text.trim().slice(0, MAX_TEXT) : '';
         if (!text) return json({ error: 'empty text' }, 400, env);
 
+        const history = sanitizeHistory(payload.history);
         const base = await loadSite(env, true);
         const sys = systemPrompt(base.files, base.skipped);
-        const out = await askOllama(env, sys, [{ role: 'user', content: text }]);
+        const out = await askOllama(env, sys, [...history, { role: 'user', content: text }]);
 
         // Änderungen anwenden + committen; bei gleichzeitigem Commit (422) einmal frisch wiederholen
         let applied, failed, committed = false;
