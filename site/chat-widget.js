@@ -1,4 +1,12 @@
-(function () {
+(async function () {
+  // Nur aktivieren, wenn ein Chat-Server erreichbar ist (lokal).
+  // Auf dem Dauer-Hoster gibt es keinen — dann bleibt der Chat unsichtbar.
+  try {
+    const probe = await fetch('/api/chat?since=' + Date.now());
+    if (!probe.ok) return;
+    await probe.json();
+  } catch { return; }
+
   const box = document.createElement('div');
   box.className = 'spanko-chat';
   box.innerHTML = `
