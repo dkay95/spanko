@@ -1,22 +1,53 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 100" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-  <!-- arc / headboard -->
-  <path d="M18 52 A42 42 0 0 1 102 52" opacity="0.9"/>
-  <!-- crescent moon -->
-  <path d="M44 20 a9 9 0 1 0 8 13 a7 7 0 1 1 -8 -13z"/>
-  <!-- stars -->
-  <path d="M62 16 l1.6 3.4 3.4 1.6 -3.4 1.6 -1.6 3.4 -1.6 -3.4 -3.4 -1.6 3.4 -1.6z" stroke-width="1.4"/>
-  <circle cx="74" cy="30" r="1.1" fill="currentColor"/>
-  <!-- mattress / bed base -->
-  <rect x="30" y="70" width="60" height="14" rx="4"/>
-  <line x1="30" y1="78" x2="90" y2="78" stroke-width="1.4" opacity="0.7"/>
-  <!-- sloth body draped on the bed -->
-  <path d="M42 70 q4 -18 20 -18 q16 0 20 18"/>
-  <!-- sloth head -->
-  <circle cx="50" cy="58" r="9"/>
-  <!-- sloth face markings (sleepy eyes) -->
-  <path d="M46 57 q1.5 2 3 0" stroke-width="1.6"/>
-  <path d="M52 57 q1.5 2 3 0" stroke-width="1.6"/>
-  <path d="M50 61 q0 1.5 0 1.5" stroke-width="1.6"/>
-  <!-- little arm hanging -->
-  <path d="M62 60 q6 6 4 14" stroke-width="1.8"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 200" aria-hidden="true">
+  <!-- Bogen -->
+  <path d="M30 150 A90 90 0 0 1 210 150" fill="none" stroke="#c99a4b" stroke-width="3" stroke-linecap="round"/>
+  <!-- Mond -->
+  <path d="M104 34 a11 11 0 1 0 10 15 a8.5 8.5 0 1 1 -10 -15 z" fill="#c99a4b"/>
+  <!-- Stern -->
+  <path d="M136 46 l2 4.6 4.6 2 -4.6 2 -2 4.6 -2 -4.6 -4.6 -2 4.6 -2 z" fill="#c99a4b"/>
+
+  <!-- Faultier-Körper (liegend) -->
+  <path d="M84 131 Q86 104 112 96 Q142 88 168 100 Q186 108 189 131 Z"
+        fill="#f4e8d0" stroke="#b98a52" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M120 95 q5 -5 11 -4" fill="none" stroke="#b98a52" stroke-width="2" stroke-linecap="round" opacity=".45"/>
+  <path d="M147 96 q6 -2 9 2" fill="none" stroke="#b98a52" stroke-width="2" stroke-linecap="round" opacity=".45"/>
+  <!-- hintere Pfote -->
+  <circle cx="179" cy="126" r="5.5" fill="#f4e8d0" stroke="#b98a52" stroke-width="2.5"/>
+
+  <!-- Matratze -->
+  <rect x="55" y="130" width="130" height="42" rx="9" fill="#fdf8ee" stroke="#c99a4b" stroke-width="2.5"/>
+  <g stroke="#ead9bd" stroke-width="2">
+    <line x1="75" y1="134" x2="75" y2="144"/>
+    <line x1="105" y1="134" x2="105" y2="144"/>
+    <line x1="135" y1="134" x2="135" y2="144"/>
+    <line x1="165" y1="134" x2="165" y2="144"/>
+  </g>
+  <line x1="60" y1="154" x2="70" y2="154" stroke="#c99a4b" stroke-width="2"/>
+  <line x1="170" y1="154" x2="180" y2="154" stroke="#c99a4b" stroke-width="2"/>
+  <text x="120" y="159" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif"
+        font-size="13" letter-spacing="4" fill="#c99a4b">SPANKO</text>
+
+  <!-- Bett-Basis + Füße -->
+  <rect x="47" y="172" width="146" height="15" rx="5" fill="#ecdebd"/>
+  <rect x="58" y="187" width="8" height="9" rx="2" fill="#cfa869"/>
+  <rect x="174" y="187" width="8" height="9" rx="2" fill="#cfa869"/>
+
+  <!-- Arm (liegt auf der Matratze, Pfote hängt leicht runter) -->
+  <path d="M108 129 Q133 120 150 126 Q158 130 156 138" fill="none" stroke="#b98a52" stroke-width="13" stroke-linecap="round"/>
+  <path d="M108 129 Q133 120 150 126 Q158 130 156 138" fill="none" stroke="#f4e8d0" stroke-width="8.5" stroke-linecap="round"/>
+
+  <!-- Kopf -->
+  <circle cx="96" cy="113" r="25" fill="#f4e8d0" stroke="#b98a52" stroke-width="3"/>
+  <!-- Augenflecken -->
+  <ellipse cx="86.5" cy="111" rx="6.5" ry="9.5" fill="#a5906f" opacity=".75" transform="rotate(-18 86.5 111)"/>
+  <ellipse cx="105.5" cy="111" rx="6.5" ry="9.5" fill="#a5906f" opacity=".75" transform="rotate(18 105.5 111)"/>
+  <!-- geschlossene Augen -->
+  <path d="M83 111 q3.5 3 7 0" fill="none" stroke="#5a4632" stroke-width="2" stroke-linecap="round"/>
+  <path d="M102 111 q3.5 3 7 0" fill="none" stroke="#5a4632" stroke-width="2" stroke-linecap="round"/>
+  <!-- Nase + Lächeln -->
+  <ellipse cx="96" cy="120.5" rx="3.2" ry="2.4" fill="#5a4632"/>
+  <path d="M92.5 126 q3.5 3 7 0" fill="none" stroke="#5a4632" stroke-width="2" stroke-linecap="round"/>
+  <!-- Bäckchen -->
+  <circle cx="79" cy="120" r="2.6" fill="#e8b27d" opacity=".5"/>
+  <circle cx="113" cy="120" r="2.6" fill="#e8b27d" opacity=".5"/>
 </svg>

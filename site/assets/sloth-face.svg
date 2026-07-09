@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" aria-hidden="true">
+  <!-- zZz -->
+  <text x="76" y="24" font-family="Georgia, serif" font-size="15" fill="#c99a4b">z</text>
+  <text x="86" y="13" font-family="Georgia, serif" font-size="10" fill="#c99a4b">z</text>
+  <!-- Kopf -->
+  <circle cx="48" cy="54" r="38" fill="#f4e8d0" stroke="#b98a52" stroke-width="3.5"/>
+  <!-- Augenflecken -->
+  <ellipse cx="33.5" cy="51" rx="9" ry="13.5" fill="#a5906f" opacity=".75" transform="rotate(-18 33.5 51)"/>
+  <ellipse cx="62.5" cy="51" rx="9" ry="13.5" fill="#a5906f" opacity=".75" transform="rotate(18 62.5 51)"/>
+  <!-- geschlossene Augen -->
+  <path d="M28.5 51 q5 4.5 10 0" fill="none" stroke="#5a4632" stroke-width="2.6" stroke-linecap="round"/>
+  <path d="M57.5 51 q5 4.5 10 0" fill="none" stroke="#5a4632" stroke-width="2.6" stroke-linecap="round"/>
+  <!-- Nase + Lächeln -->
+  <ellipse cx="48" cy="65" rx="4.4" ry="3.3" fill="#5a4632"/>
+  <path d="M42.5 73 q5.5 4.5 11 0" fill="none" stroke="#5a4632" stroke-width="2.6" stroke-linecap="round"/>
+  <!-- Bäckchen -->
+  <circle cx="22" cy="65" r="3.8" fill="#e8b27d" opacity=".5"/>
+  <circle cx="74" cy="65" r="3.8" fill="#e8b27d" opacity=".5"/>
+</svg>
