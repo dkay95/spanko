@@ -32,7 +32,25 @@ bash scripts/start.sh
 5. Claude ändert das Design und schreibt eine Antwort zurück, die der Kollege im
    Chat sieht. Nach einem Neuladen der Seite sieht er die Änderung.
 
-## Wichtig (die eine Einschränkung)
+## Dauerhaft online (GitHub Pages)
+
+Die **Design-Website** liegt dauerhaft (24/7, ohne deinen Mac) unter:
+
+> **https://dkay95.github.io/spanko/**
+
+Dort ist der Chat automatisch ausgeblendet (es gibt keinen Server). Nach Design-
+Änderungen aktualisierst du die öffentliche Seite mit **einem Befehl**:
+
+```bash
+bash scripts/deploy.sh
+```
+
+(Änderungen vorher committen.) Nach ~1 Minute ist die neue Version live.
+
+Der **lokale Server + Chat** (unten beschrieben) ist weiterhin nur zum gemeinsamen
+Bearbeiten gedacht und läuft nur, solange dein Mac + die Claude-Session an sind.
+
+## Wichtig (die eine Einschränkung – gilt nur für den lokalen Chat)
 
 Alles läuft auf **deinem Mac**. Der Link funktioniert nur, **solange dein Mac an ist,
 das Start-Skript läuft und die Claude-Session offen ist**. Machst du den Laptop zu, ist
